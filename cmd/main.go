@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/silvan-talos/cookie-syncer/mysql"
+	"github.com/silvan-talos/cookie-syncer/partner"
 	"github.com/silvan-talos/cookie-syncer/server"
 )
 
@@ -16,7 +21,14 @@ const (
 )
 
 func main() {
-	server := server.New()
+	db, err := sql.Open("mysql", "root:root@/syncer")
+	if err != nil {
+		log.Println("failed to connect to the database:", err)
+		return
+	}
+	partners := mysql.NewPartnerRepository(db)
+	ps := partner.NewService(partners)
+	server := server.New(ps)
 	errs := make(chan error, 2)
 	go func() {
 		log.Println("starting server")

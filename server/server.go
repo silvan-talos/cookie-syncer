@@ -7,25 +7,30 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+
+	"github.com/silvan-talos/cookie-syncer/partner"
 )
 
 // Server defines dependencies for the HTTP server
 type Server struct {
+	Partner partner.Service
 	router chi.Router
 }
 
 // New returns a new server
-func New() *Server {
-	s := &Server{}
+func New(ps partner.Service /*, ss syncing.Service*/) *Server {
+	s := &Server{
+		Partner: ps,
+	}
 
 	r := chi.NewRouter()
 
 	r.Get("/ping", pong)
 
-	// r.Route("/statistics", func(r chi.Router) {
-	// 	h := entryHandler{s.Entry}
-	// 	r.Mount("/", h.router())
-	// })
+	r.Route("/partners", func(r chi.Router) {
+		h := partnerHandler{s.Partner}
+		r.Mount("/", h.router())
+	})
 
 	s.router = r
 	return s
