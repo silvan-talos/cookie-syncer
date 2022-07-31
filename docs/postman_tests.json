@@ -1,0 +1,126 @@
+{
+	"info": {
+		"_postman_id": "c0287e20-682b-4e0e-97ee-6d0b922dd1cb",
+		"name": "cookie-syncer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22373104"
+	},
+	"item": [
+		{
+			"name": "partners",
+			"item": [
+				{
+					"name": "Add partner",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "Name",
+									"value": "SSP",
+									"type": "text"
+								},
+								{
+									"key": "URL",
+									"value": "http://127.0.0.1:8080",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/partners",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"partners"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "syncing",
+			"item": [
+				{
+					"name": "Pixel request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8080/partners/3894994b-7fef-402b-8344-1d3359c5de93/sync/img.gif",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"partners",
+								"3894994b-7fef-402b-8344-1d3359c5de93",
+								"sync",
+								"img.gif"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Status request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8080/partners/3894994b-7fef-402b-8344-1d3359c5de93/sync",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"partners",
+								"3894994b-7fef-402b-8344-1d3359c5de93",
+								"sync"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:8080/ping",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
