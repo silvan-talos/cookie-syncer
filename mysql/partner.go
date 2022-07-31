@@ -3,7 +3,6 @@ package mysql
 import (
 	"database/sql"
 	_ "embed"
-	"log"
 
 	syncer "github.com/silvan-talos/cookie-syncer"
 )
@@ -23,7 +22,6 @@ func NewPartnerRepository(db *sql.DB) syncer.PartnerRepository {
 var storePartner string
 
 func (pr *partnerRepository) Store(p *syncer.Partner) error {
-	log.Println("SQL script:", storePartner)
 	_, err := pr.DB.Exec(storePartner, p.ID, p.Name, p.URL)
 	return err
 }

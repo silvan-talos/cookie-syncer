@@ -9,4 +9,5 @@ type Sync struct {
 
 type SyncRepository interface {
 	Store(sync *Sync) error
+	GetAllForPartner(partnerID string) ([]Sync, error)
 }

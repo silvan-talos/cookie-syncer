@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -21,6 +22,7 @@ func (h *syncingHandler) router() chi.Router {
 	r := chi.NewRouter()
 	r.Get("/img.gif", h.getPixel)
 	r.Get("/usermatch.gif", h.saveUserMatch)
+	r.Get("/", h.getSyncStatus)
 	return r
 }
 
@@ -122,4 +124,25 @@ func (h *syncingHandler) saveUserMatch(w http.ResponseWriter, r *http.Request) {
 	go h.s.SyncUsers(partnerID, otherPID, userID, opUserID)
 	http.SetCookie(w, c)
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *syncingHandler) getSyncStatus(w http.ResponseWriter, r *http.Request) {
+	partnerID := chi.URLParam(r, "partnerID")
+	syncs, err := h.s.GetStatus(partnerID)
+	if err != nil {
+		log.Println("failed to get status from db:", err)
+		jsonError(w, "no data available", http.StatusNotFound)
+		return
+	}
+	var response = struct {
+		Syncs []syncing.Status `json:"status"`
+	}{
+		Syncs: syncs,
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Println("error encoding status response:", err)
+		jsonError(w, "error getting status", http.StatusInternalServerError)
+		return
+	}
 }
