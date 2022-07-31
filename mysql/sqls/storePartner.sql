@@ -1,2 +1,2 @@
-INSERT INTO Partner(ID, Name)
-Values(?,?);
+INSERT INTO Partner(ID, Name, URL)
+Values(?,?,?);

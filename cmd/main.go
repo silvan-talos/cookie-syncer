@@ -14,6 +14,7 @@ import (
 	"github.com/silvan-talos/cookie-syncer/mysql"
 	"github.com/silvan-talos/cookie-syncer/partner"
 	"github.com/silvan-talos/cookie-syncer/server"
+	"github.com/silvan-talos/cookie-syncer/syncing"
 )
 
 const (
@@ -26,9 +27,13 @@ func main() {
 		log.Println("failed to connect to the database:", err)
 		return
 	}
+	defer db.Close()
+
 	partners := mysql.NewPartnerRepository(db)
+	syncs := mysql.NewSyncRepository(db)
 	ps := partner.NewService(partners)
-	server := server.New(ps)
+	ss := syncing.NewService(syncs)
+	server := server.New(ps, ss)
 	errs := make(chan error, 2)
 	go func() {
 		log.Println("starting server")

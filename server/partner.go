@@ -24,11 +24,13 @@ func (h *partnerHandler) addPartner(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	var request = struct {
 		Name string
+		URL  string
 	}{
 		r.FormValue("Name"),
+		r.FormValue("URL"),
 	}
 
-	id, err := h.p.AddPartner(request.Name)
+	id, err := h.p.AddPartner(request.Name, request.URL)
 	if err != nil {
 		log.Println("failed to add partner:", err)
 		jsonError(w, "failed to add partner", http.StatusInternalServerError)
