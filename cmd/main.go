@@ -22,7 +22,7 @@ const (
 )
 
 func main() {
-	db, err := sql.Open("mysql", "root:root@/syncer")
+	db, err := sql.Open("mysql", "root:root@tcp(cookie_syncer_db)/syncer")
 	if err != nil {
 		log.Println("failed to connect to the database:", err)
 		return

@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    build:
+      context: ./MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: syncer
+      MYSQL_USER: silvan
+      MYSQL_PASSWORD: docker
+    container_name: cookie_syncer_db
+    ports:
+      - "3306:3306"
+    tty: true
+    image: silvantalos/mysql8db
+  app:
+    build:
+      context: .
+    volumes:
+      - "./cookie-syncer:/go"
+    container_name: cookie_syncer_app
+    ports:
+      - "8080:8080"
+    tty: true
+    image: silvantalos/cookie-syncer
+    depends_on:
+      - db
