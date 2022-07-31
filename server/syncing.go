@@ -37,37 +37,19 @@ func (h *syncingHandler) getPixel(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *syncingHandler) syncWithOther(partnerID string, w http.ResponseWriter, r *http.Request) {
-	log.Println("Start syncing")
 	otherPartner := make(chan syncer.Partner)
 	go h.getOtherPartner(otherPartner, partnerID)
-	userID := ""
-	c, err := r.Cookie(partnerID)
-	if err != nil {
-		log.Println("Cookie not found. Adding one...")
-		userID = uuid.New().String()
-		c = &http.Cookie{
-			Name:     partnerID,
-			Value:    userID,
-			SameSite: http.SameSiteNoneMode,
-			Secure:   true,
-			Path:     "/",
-		}
-	} else {
-		userID = c.Value
-		log.Println("cookie already there, userID:", userID)
-	}
-	c.MaxAge = 3600
-	http.SetCookie(w, c)
+	userID := getUserIDfromCookie(partnerID, w, r)
 	op := <-otherPartner
 	otherPID := op.ID
 	opURL := op.URL
 	url := opURL + "/partners/" + otherPID + "/sync/img.gif?partner=" + partnerID + "&partner_uid=" + userID
-	log.Println("url:", url, "opurl", opURL)
+	log.Println("url:", url)
 	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusFound)
 }
-func (h *syncingHandler) saveMatchAndRedirect(partnerID, otherPID, opUserID string, w http.ResponseWriter, r *http.Request) {
-	log.Println("Save and redirect")
+
+func getUserIDfromCookie(partnerID string, w http.ResponseWriter, r *http.Request) string {
 	userID := ""
 	c, err := r.Cookie(partnerID)
 	if err != nil {
@@ -79,15 +61,21 @@ func (h *syncingHandler) saveMatchAndRedirect(partnerID, otherPID, opUserID stri
 			SameSite: http.SameSiteNoneMode,
 			Secure:   true,
 			Path:     "/",
+			MaxAge:   3600 * 24 * 365,
 		}
 	} else {
 		userID = c.Value
 		log.Println("cookie already there, userID:", userID)
 	}
+	http.SetCookie(w, c)
+	return userID
+}
+
+func (h *syncingHandler) saveMatchAndRedirect(partnerID, otherPID, opUserID string, w http.ResponseWriter, r *http.Request) {
+	log.Println("Save and redirect")
+	userID := getUserIDfromCookie(partnerID, w, r)
 	//save Match
 	go h.s.SyncUsers(partnerID, otherPID, userID, opUserID)
-	c.MaxAge = 3600
-	http.SetCookie(w, c)
 	otherPartner, err := h.p.GetByID(otherPID)
 	if err != nil {
 		log.Println("failed to get partner with id", otherPID, "error:", err)
@@ -132,7 +120,6 @@ func (h *syncingHandler) saveUserMatch(w http.ResponseWriter, r *http.Request) {
 	}
 	//save Match
 	go h.s.SyncUsers(partnerID, otherPID, userID, opUserID)
-	c.MaxAge = 3600
 	http.SetCookie(w, c)
 	w.WriteHeader(http.StatusNoContent)
 }
